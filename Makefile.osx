@@ -1,0 +1,22 @@
+SRILM_LIBS=/Users/james/opt/src/srilm/lib/macosx
+SRILM_INC=/Users/james/opt/src/srilm/include
+PYTHON_BIN=/opt/local/Library/Frameworks/Python.framework/Versions/2.5/bin/python2.5
+PYTHON_INC=/opt/local/Library/Frameworks/Python.framework/Versions/2.5/include/python2.5
+FRAMEWORKS=/opt/local/Library/Frameworks
+
+python: clean _srilm_wrapper.so
+
+_srilm_wrapper.so: srilm_wrapper.o srilm_python_wrap.o
+	g++ $^ -dynamic -loolm -ldstruct -lmisc -L$(SRILM_LIBS) -F$(FRAMEWORKS) -framework Python -bundle -bundle_loader $(PYTHON_BIN) -o $@
+
+srilm_python_wrap.o: srilm_python_wrap.c
+	g++ -c -fPIC $< -I/usr/local/include/ -I$(SRILM_INC) -I$(PYTHON_INC)
+
+srilm_python_wrap.c: srilm_python.i
+	swig -python $<
+
+srilm_wrapper.o: srilm_wrapper.c
+	g++ -c -fPIC $< -I/usr/local/include/ -I$(SRILM_INC) -I$(PYTHON_INC)
+
+clean:
+	\rm -fr srilm_wrapper.o srilm_*_wrap.* *.so srilm_wrapper.py* srilm.pyc

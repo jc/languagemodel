@@ -1,0 +1,20 @@
+SRILM_LIBS=/shared/grandpa/opt/src/srilm/lib/i686
+SRILM_INC=/shared/grandpa/opt/src/srilm/include
+PYTHON_INC=/shared/grandpa/opt/include/python2.6
+
+python: clean _srilm_wrapper.so
+
+_srilm_wrapper.so: srilm_wrapper.o srilm_python_wrap.o
+	g++ -shared $^ -loolm -ldstruct -lmisc -L$(SRILM_LIBS) -o $@
+
+srilm_python_wrap.o: srilm_python_wrap.c
+	g++ -c -fPIC $< -I/usr/local/include/ -I$(SRILM_INC) -I$(PYTHON_INC)
+
+srilm_python_wrap.c: srilm_python.i
+	swig -python $<
+
+srilm_wrapper.o: srilm_wrapper.c
+	g++ -c -fPIC $< -I/usr/local/include/ -I$(SRILM_INC) -I$(PYTHON_INC)
+
+clean:
+	\rm -fr srilm_wrapper.o srilm_*_wrap.* *.so srilm_wrapper.py* srilm.pyc
